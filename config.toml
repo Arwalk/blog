@@ -2,6 +2,7 @@ baseURL = 'https://blog.arwalk.net/'
 languageCode = 'en-us'
 title = "Arwalk's blog"
 theme = "pickles"
+
 [markup]
   [markup.asciidocExt]
     extensions = []
@@ -9,5 +10,17 @@ theme = "pickles"
       source-highlighter="rouge"
       relfileprefix="../"
       relfilesuffix="/"
+
 [params]
+  paginate = 10
   custom_css = ["css/monokai.css"]
+  github = "Arwalk"
+  youtube = "Arwalk"
+  bio = "I pretend every day that i'm a software engineer and have been very successful at it."
+  subtitle = "Programming, video games, stuff."
+#  contact = "siragentprovocateurarwalk@gmail.com"
+
+[[menu.main]]
+    name = "Blog"
+    url = "/"
+    weight = 1
