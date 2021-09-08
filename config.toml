@@ -10,4 +10,4 @@ theme = "pickles"
       relfileprefix="../"
       relfilesuffix="/"
 [params]
-  custom_css = ["css/molokai.css"]
+  custom_css = ["css/monokai.css"]

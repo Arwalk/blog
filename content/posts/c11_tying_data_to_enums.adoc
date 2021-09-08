@@ -204,7 +204,7 @@ It breaks at compile time.
  _Static_assert(FRUITS_NUM_VALUE == SIZE_data_array, "Some data is missing in data_array.");
 ----
 
-That's nice!We now have the same verification at compile time than the X macro.
+That's nice! We now have the same verification at compile time than the X macro.
 
 == But wait, my enum has skips!
 
@@ -226,7 +226,7 @@ typedef enum
 
 It’s easy. We’re going to go back to X macros!
 
-They will allow us to define the enum the way we want, and to [count the number of elements in our enum](https://stackoverflow.com/a/25354018/11561171) at the same time.
+They will allow us to define the enum the way we want, and to https://stackoverflow.com/a/25354018/11561171[count the number of elements in our enum] at the same time.
 
 .fruits.h
 [source,c]

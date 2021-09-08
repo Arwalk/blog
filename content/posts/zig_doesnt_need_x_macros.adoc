@@ -1,22 +1,20 @@
 ---
-title: "Zig_doesnt_need_x_macros"
+title: "Zig doesn't need X macros"
 date: 2021-09-08T18:26:46+02:00
 draft: true
 ---
 
-Tags: #Programming  #Zig #C #C11
-
 If you remember the previous article xref:c11_tying_data_to_enums.adoc[C11 tying data to enums], you might know that i enjoy safety at compile time if i don't have to compromise with exposing implementation to the user.
 
-I've been tinkering with Zig lately and it has been a real pleasure. The language feels like a better C in so many ways, without actually changing of paradigm.
+I've been tinkering with Zig lately and it has been a real pleasure.The language feels like a better C in so many ways, without actually changing of paradigm.
 
-## The easy way
+== The easy way
 
-Talking about this, if we reuse our fruits example in zig, it's so simple to avoid any compromise that it hurts. If we have such a `fruits.zig` library called by a `main.zig` program, here's how it might look.
+Talking about this, if we reuse our fruits example in zig, it's so simple to avoid any compromise that it hurts.If we have such a `fruits.zig` library called by a `main.zig` program, here's how it might look.
 
-fruits.zig
-
-```zig
+.fruits.zig
+[source,zig]
+----
 pub const Fruits = enum {
 
 	 Apple,
@@ -31,8 +29,7 @@ pub const Fruits = enum {
 	 };
 
 	 pub fn get_weight(self: Fruits) u32 {
-
-		 return switch (self) {
+		 return switch (self){
 			 .Apple => 50,
 			 .Banana => 100,
 			 .Strawberry => 10,
@@ -41,17 +38,16 @@ pub const Fruits = enum {
 	 }
 
 	 pub fn get_size(self: Fruits) u32 {
-		 return switch (self) {
+		 return switch (self){
 			 .Apple => 10,
 			 .Banana => 20,
 			 .Strawberry => 10,
 			 .Peach => 12
-
 		 };
 	 }
 
 	 pub fn get_color(self: Fruits) Color {
-		 return switch (self) {
+		 return switch (self){
 			 .Apple => .Green,
 			 .Banana => .Yellow,
 			 .Strawberry => .Red,
@@ -59,23 +55,21 @@ pub const Fruits = enum {
 		 };
 	 }
 
-	 pub fn get_name(self: Fruits) \[\]const u8 {
-
-	 	return switch (self) {
+	 pub fn get_name(self: Fruits)[]const u8 {
+	 	return switch (self){
 			 .Apple => "Apple",
 			 .Banana => "Banana",
 			 .Strawberry => "Strawberry",
 			 .Peach => "Peach"
-
 		 };
 	 }
 
 };
-```
+----
 
-main.zig
-
-```zig
+.main.zig
+[source,zig]
+----
 const std = @import("std");
 const fruits = @import("fruits.zig");
 const Fruits = fruits.Fruit
@@ -83,17 +77,18 @@ const Fruits = fruits.Fruit
 pub fn main() anyerror!void {
  	const peach = Fruits.Peach;
 
- 	std.debug.print("My fruit is a {s}, of color {} which weight {} and with a size of {}",
+ 	std.debug.print("My fruit is a {s}, of color {} which weight {} and with a size of {}",
 	.{peach.get_name(), peach.get_color(), peach.get_weight(), peach.get_size()});
 
 };
-```
+----
 
 This would print a nice `My fruit is a Peach, of color Color.Red which weight 45 and with a size of 12`.
 
-Right away, with this implementation, we don't have any need for more tools than the language itself: `switch-case` statements must be exhaustive in Zig. So if we add a new fruit, the compiler complains right away:
+Right away, with this implementation, we don't have any need for more tools than the language itself: `switch-case` statements must be exhaustive in Zig.So if we add a new fruit, the compiler complains right away:
 
-```gcc
+[source,gcc]
+----
 .\src\fruits.zig:42:16: error: enumeration value 'fruits.Fruits.Pear' not handled in switch
         return switch (self) {
                ^
@@ -117,17 +112,19 @@ Right away, with this implementation, we don't have any need for more tools than
                ^
 .\src\fruits.zig:23:39: note: referenced here
     pub fn get_size(self: Fruits) u32 {
-```
+----
 
 That was easy.
 
-## The fun way
+== The fun way
 
-Ok, the point of the previous article was that you could enforce custom rules at compile time in #C11 using `static_assert`. #Zig has the possibility to evaluate code at compile time, which is an even more precise tool than `static_assert`.
+Ok, the point of the previous article was that you could enforce custom rules at compile time in #C11 using `static_assert`.
+Zig has the possibility to evaluate code at compile time, which is an even more precise tool than `static_assert`.
 
 Let's make an array with an internal structure to hold all our data just like in C.
 
-```zig
+[source,zig]
+----
 pub const Fruits = enum {
     Apple,
     Banana,
@@ -187,38 +184,45 @@ pub const Fruits = enum {
         } else unreachable;
     }
 };
-```
+----
 
-Notice the `else unreachable` that informs the compiler that we will ALWAYS have something to return out of our internal_data array. If we fail to comply, this is undefined behavior (at worst. On safe builds, it will just panic).
+Notice the `else unreachable` that informs the compiler that we will ALWAYS have something to return out of our internal_data array.
+If we fail to comply, this is undefined behavior (at worst. On safe builds, it will just panic).
 
 What we want to enforce is that for each value in our enum, one line of the array is available and contains all our data.
 
-That last part is easy: except if you put voluntarily a default value, it's impossible to instantiate a struct in zig without putting a value explicitly in all fields. We're not gonna focus on that.
+That last part is easy: except if you put voluntarily a default value, it's impossible to instantiate a struct in zig without putting a value explicitly in all fields.
+We're not gonna focus on that.
 
 What we are going to focus though, is the first part.
 
 Let's open a `comptime` block and check this.
 
-```zig
+[source,zig]
+----
 comptime {
 	if(internal_data.len != @typeInfo(Fruits).Enum.fields.len) {
 		@compileError("Some data is missing in internal_data");
 	}
 }
-```
+----
 
-Wow. That was hard. Let's check, if i add a new fruit...
+Wow.That was hard. Let's check, if I add a new fruit...
 
-```gcc
+[source,gcc]
+----
 .\src\fruits.zig:31:13: error: Some data is missing in internal_data
             @compileError("Some data is missing in internal_data");
-```
+----
 
-Ok. This is nice. But do you know what was impossible to check with `static_assert` that now we can do? Checking that there is _one and only one line for each different enum value_.
+Ok.This is nice.
+But do you know what was impossible to check with `static_assert` that now we can do?
+Checking that there is _one and only one line for each different enum value_.
 
 Come on, this is easy, we can evaluate _anything_ at compile time in zig.
 
-```zig
+[source,zig]
+----
 comptime {
 	if(internal_data.len != @typeInfo(Fruits).Enum.fields.len) {
 		@compileError("Some data is missing in internal_data");
@@ -239,31 +243,34 @@ comptime {
 		}
 	}
 }
-```
+----
 
-This was less easy, as there is no direct way to iterate over an enum, but this is still clear enough. Now if i replace my `.enum_value = .Peach` by `.enum_value = .Apple` in the last line of my array, this gives me...
+This was less easy, as there is no direct way to iterate over an enum, but this is still clear enough.
+Now if I replace my `.enum_value = .Peach` by `.enum_value = .Apple` in the last line of my array, this gives me...
 
-```gcc
+[source,gcc]
+----
 .\src\fruits.zig:38:25: error: Duplicate entries!
                         @compileError("Duplicate entries!");
-```
+----
 
 This is nice.
 
-## Conclusion
+== Conclusion
 
 Zig rules.
 
-Also, our compilation messages could have been more clearer, using `@compileLog` for example. But this is for another time.
+Also, our compilation messages could have been clearer, using `@compileLog` for example.But this is for another time.
 
-Also, remember, this doesn't exposes any implementation detail to the user. If in `main.zig` i try to access `Fruits.internal_data` ...
+Also, remember, this doesn't expose any implementation detail to the user.If in `main.zig` I try to access `Fruits.internal_data` ...
 
-```gcc
+[source,gcc]
+----
 .\src\main.zig:7:28: error: 'internal_data' is private
     const internal = Fruits.internal_data;
                            ^
 .\src\fruits.zig:21:5: note: declared here
     const internal_data = [_]Data {
-```
+----
 
-I'll be frank, i am very hyped for Zig.
+I'll be frank, I am very hyped for Zig.
