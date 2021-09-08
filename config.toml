@@ -3,6 +3,9 @@ languageCode = 'en-us'
 title = "Arwalk's blog"
 theme = "pickles"
 
+[author]
+    name = "Arwalk"
+
 [markup]
   [markup.asciidocExt]
     extensions = []
