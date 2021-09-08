@@ -5,5 +5,7 @@ theme = "pickles"
 [markup]
   [markup.asciidocExt]
     extensions = []
+    [markup.asciidocExt.attributes]
+    source-highlighter="rouge"
 [params]
   custom_css = ["css/molokai.css"]

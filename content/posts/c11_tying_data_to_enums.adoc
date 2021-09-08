@@ -1,13 +1,13 @@
 ---
 title: "C11 : Tying data to enums"
 date: 2021-09-08T16:38:52+02:00
-draft: true
+draft: false
 ---
 
 
 Let’s say you’re making a C library that deals with fruits.Fruits have many "attributes" that could be tied to them.They could have a size, a color, and a weight, for starters.
 
-When you’re adding a new fruit, you want to be sure to add these attributes too.So, like many people, you start to use [X macros](https://stackoverflow.com/questions/6635851/real-world-use-of-x-macros).After all, it’s a typical use.
+When you’re adding a new fruit, you want to be sure to add these attributes too.So, like many people, you start to use https://stackoverflow.com/questions/6635851/real-world-use-of-x-macros[X macros]. After all, it’s a typical use.
 
 Your lib could look like this:
 
