@@ -6,6 +6,8 @@ theme = "pickles"
   [markup.asciidocExt]
     extensions = []
     [markup.asciidocExt.attributes]
-    source-highlighter="rouge"
+      source-highlighter="rouge"
+      relfileprefix="../"
+      relfilesuffix="/"
 [params]
   custom_css = ["css/molokai.css"]
