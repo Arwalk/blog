@@ -1,0 +1,9 @@
+baseURL = 'https://blog.arwalk.net/'
+languageCode = 'en-us'
+title = "Arwalk's blog"
+theme = "pickles"
+[markup]
+  [markup.asciidocExt]
+    extensions = []
+[params]
+  custom_css = ["css/molokai.css"]
