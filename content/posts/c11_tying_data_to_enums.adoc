@@ -70,17 +70,17 @@ struct my_data_array_s
 
 Using X macros ensures that if you add a new fruit in the list, you have to add its attributes too.This then populates automatically the data_array with the new value and attributes, and you can’t forget to update this array.
 
-That’s the big pro of X macros.It allows you to define a bunch of information in a single place, and reuse it easily.
+That’s the big pro of X macros. It allows you to define a bunch of information in a single place, and reuse it easily.
 
-In our case though, it has a big con.Namely, you’re breaking the first rule of implementation details in interfaces:
+In our case though, it has a big con. Namely, you’re breaking the first rule of implementation details in interfaces:
 
 **You don’t talk about implementation details in interfaces.**
 
-The data in data_array is strictly implementation detail.If data about the fruits where to be dynamically loaded (through a file, for example) at a later point, You still gave the opportunity to the user to use the details directly.And remember: the user will always do stupid shit with your interface._Remember that you too are someone else’s user._
+The data in data_array is strictly implementation detail. If data about the fruits were to be dynamically loaded (through a file, for example) at a later point, You still gave the opportunity to the user to use the details directly. And remember: the user will always do stupid shit with your interface._Remember that you too are someone else’s user._
 
 == The fix
 
-Considering the user’s behavior, you have no choice but to leave the minimum of information on your interface.Namely, the enum itself.
+Considering the user’s behavior, you have no choice but to leave the minimum of information on your interface. Namely, the enum itself.
 
 .fruits.h
 [source,c]
@@ -133,9 +133,9 @@ struct my_data_array_s
 #define SIZE_data_array (sizeof(data_array)/sizeof(data_array[0]))
 ----
 
-But now, you don’t have this guarantee that you won’t forget to update data_array at compile time if you add a new enum value, like with the X macro.Luckily, you are working in a relatively modern environment.And you have access to #C11. So you can actually enforce this.
+But now, you don’t have this guarantee that you won’t forget to update data_array at compile time if you add a new enum value, like with the X macro.Luckily, you are working in a relatively modern environment. And you have access to #C11. So you can actually enforce this.
 
-To make it short, you have to ensure at compile time that size of data_array is the same as the number of values in fruits_e.Let’s start by adding a "num value" value to our enum.
+To make it short, you have to ensure at compile time that size of data_array is the same as the number of values in fruits_e. Let’s start by adding a "num value" value to our enum.
 
 .fruits.h
 [source,c]
@@ -178,10 +178,10 @@ struct my_data_array_s
 _Static_assert(FRUITS_NUM_VALUE == SIZE_data_array, "Some data is missing in data_array.");
 ----
 
-Now, if i add a new value in my fruits_e enum…​
+Now, if I add a new value in my fruits_e enum…​
 
 .fruits.h
-[source,c]
+[source, c]
 ----
 typedef enum
 {
@@ -224,7 +224,7 @@ typedef enum
 } fruits_e;
 ----
 
-It’s easy.We’re gonna go back to X macros!
+It’s easy. We’re going to go back to X macros!
 
 They will allow us to define the enum the way we want, and to [count the number of elements in our enum](https://stackoverflow.com/a/25354018/11561171) at the same time.
 
@@ -278,4 +278,4 @@ Sadly, because of how the preprocessor works, we can’t define FRUITS_NUM_VALUE
 
 X macros are powerful tools, but you should be careful not to expose any detail of your implementation if you are using them in a header.With C11, you have the possibility to have the same level of compile-time check using `_Static_assert`, making them much more interesting to use directly.
 
-If you’re not using them in any interface though, you’re free to do it the way you want.Just be careful from the evil users.
+If you’re not using them in any interface though, you’re free to do it the way you want. Just be careful from the evil users.
