@@ -27,3 +27,8 @@ theme = "pickles"
     name = "Blog"
     url = "/"
     weight = 1
+
+[[menu.main]]
+    name = "Mastodon"
+    url = "https://noagendasocial.com/@Arwalk"
+    weight = 1
