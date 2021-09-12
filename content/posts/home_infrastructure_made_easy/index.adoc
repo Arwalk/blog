@@ -8,20 +8,24 @@ Hey everyone.
 I've decided to start a small set of tutorials that should allow you to setup and maintain an IT infrastructure at home relatively easily.
 
 These tutorials suppose that you know how to:
-- Access your router's configuration panel - ssh into a remote system - Know some basics of networking.
+
+- Access your router's configuration panel
+- ssh into a remote system (much easier to access it)
+- Know some basics of networking (such as what is a DNS, DHCP..)
 
 The rest will be as self-explanatory as possible, or i'll try to link to some other sources that will explain everything.
 
-Networking is not my line of work, and what i'm describing here is only what i think is a decent home set-up that is easy to maintain.
+Networking nor IT infrastructure is not my line of work, and what i'm describing here is only what i think is a decent home set-up that is easy to maintain.
 
 == Introduction
 
-=== Hardware requirements
+=== Requirements
 
 This whole series supposes that you have 2 machines for your infrastructure
 
 - A low-powered machine dedicated to DHCP and internal DNS
 - A "server" machine that will host the applications you want to host.
+- A domain name
 
 For the first machine, a raspberry pi-like machine is enough.
 You don't even need a "high end" pi, a simple raspberry pi 2 or 3 would be enough.
@@ -55,9 +59,38 @@ Here's the thing, we're not just going to set up a simple DNS, we're going to us
 
 Pi-hole is a "network-wide ad blocker" that is actually a DNS server. It's just that DNS requests made to domains associated to ads are rejected by the pi-hole, which effectively blocks the ads.
 
-What is really great is that pi-hole has it's own DHCP server integrated too! It basically does everything we want in one go.
+What is really great is that pi-hole has its own DHCP server integrated too! It basically does everything we want in one go.
 
 === Installing pi-hole
 
 At this point, I consider that you have a running raspberry-pi that you can configure either directly or through ssh.
-If you don't know how to activate SSH on your pi, refer to the https://www.raspberrypi.org/documentation/computers/remote-access.html[official documentation]
+If you don't know how to activate SSH on your pi, refer to the https://www.raspberrypi.org/documentation/computers/remote-access.html[official documentation], it's a common question.
+
+Before, starting, you must ensure your raspberry pi's ip address is fixed.
+There are many guides on the subject, https://pimylifeup.com/raspberry-pi-static-ip-address/[here's one] at random.
+
+Now, let's just install pi-hole with the simple https://github.com/pi-hole/pi-hole/#one-step-automated-install[automated installation process].
+
+just run
+
+[source, bash]
+----
+curl -sSL https://install.pi-hole.net | bash
+----
+
+and the pi-hole installation should be done soon enough. The defaults are fine, you might want to choose your upstream DNS server if google's aren't your favorite choice.
+
+Don't forget to note the password for the admin panel, it should be given at the end of the installation process.
+
+=== Preparing the DHCP
+
+Once the pi-hole is properly installed, connect to the admin panel by going to *++http://<pi-hole address>/admin++* and go to *settings* -> *DHCP*.
+
+Here, you can now select the IP range you want to use, and input your router's IP address. As an example, here is my settings, but feel free to adapt.
+
+image::DHCP.png[]
+
+Before turning your DHCP up, disable your router's DHCP to avoid any conflict.
+Once pi-hole's DHCP is up and your router's down, reboot both of them, and refresh your computer's IP.
+You should be able to check that now your DNS' address is the pi-hole address.
+
