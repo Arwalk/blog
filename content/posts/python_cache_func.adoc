@@ -8,7 +8,7 @@ Here's a quick trick. It's extremely easy to cache a function's output in python
 
 Let's say you have this heavy computation task in your python code. Or something that repeatedly gets similar inputs at least.
 
-Speeding it up would be costly, so you wonder how you add a caching mechanism in it without having to rewrite your entire code base around it.
+Speeding it up would be costly, so you wonder how you could add a caching mechanism in it without having to rewrite your entire code base around it.
 
 Here is our example for now:
 
