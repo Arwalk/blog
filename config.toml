@@ -21,7 +21,7 @@ theme = "pickles"
   youtube = "Arwalk"
   bio = "I pretend every day that i'm a software engineer and have been very successful at it."
   subtitle = "Programming, video games, stuff."
-#  contact = "siragentprovocateurarwalk@gmail.com"
+  contact = "mailto:siragentprovocateurarwalk@gmail.com"
 
 [[menu.main]]
     name = "Blog"
