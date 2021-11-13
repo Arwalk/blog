@@ -1,7 +1,7 @@
 ---
 title: "Zig for Cypress STM32 boards"
 date: 2021-11-13T10:37:00+01:00
-draft: true
+draft: false
 ---
 
 Let's make a very simple tutorial on how to use Zig for cypress STM32 boards. You'll be surprised how easy it is.
