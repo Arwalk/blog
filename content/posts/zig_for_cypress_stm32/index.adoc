@@ -250,4 +250,4 @@ export fn main() i32 {
 
 The sky is the limit at this point. And you can leverage zig's allocator pattern to use dynamically allocated memory too: just have to write the allocator for your board.
 
-Have fun!____
+Have fun!
