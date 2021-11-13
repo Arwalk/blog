@@ -195,8 +195,6 @@ Ok, here's a quick hack for fun. `main` is a method like any other. You can actu
 ----
 #include "project.h"
 
-extern uint32_t zig_main();
-
 extern int main(void);
 ----
 
@@ -206,7 +204,7 @@ extern int main(void);
 extern fn Pin_1_Write(value: u8) void;
 extern fn CyDelay(milliseconds: u32) void ;
 
-export fn main() i32 {
+export fn main() c_int {
     while(true) {
         Pin_1_Write(0); // switch off the LED
         CyDelay(1000); // delay
@@ -238,7 +236,7 @@ fn get_random() u32 {
     return std.rand.Random.uintAtMost(&prng.random, u32, 2000);
 }
 
-export fn main() i32 {
+export fn main() c_int {
     while(true) {
         Pin_1_Write(0); // switch off the LED
         CyDelay(get_random()); // delay
