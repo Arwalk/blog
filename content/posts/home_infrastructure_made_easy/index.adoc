@@ -12,6 +12,7 @@ These tutorials suppose that you know how to:
 - Access your router's configuration panel
 - ssh into a remote system (much easier to access it)
 - Know some basics of networking (such as what is a DNS, DHCP..)
+- Know some basic linux commands and ecosystem
 
 The rest will be as self-explanatory as possible, or i'll try to link to some other sources that will explain everything.
 
@@ -27,9 +28,13 @@ This whole series supposes that you have 2 machines for your infrastructure
 - A "server" machine that will host the applications you want to host.
 - A domain name
 
+==== The low power machine
+
 For the first machine, a raspberry pi-like machine is enough.
 You don't even need a "high end" pi, a simple raspberry pi 2 or 3 would be enough.
 Anything else would probably be overkill.
+
+==== The server
 
 For the second machine, I'd advise using something more beefy and more importantly, something with an x86_64 processor, not an ARM one.
 I personnally use an Intel NUC machine as they're pretty silent and the small form-factor is practical.
@@ -37,6 +42,10 @@ I personnally use an Intel NUC machine as they're pretty silent and the small fo
 ARM is excellent, and you can do with an ARM server machine, but it will bring a bit more work later.
 Mostly, this setup relies on using docker almost exclusively for hosting applications, and not all docker images are ARM compatible.
 You can circumvent that by building your own docker images, but that can be a lot of work.
+
+==== The domain name
+
+If you can ensure your home public IP address is static, any domain name provider will do. If you can't though, don't worry: a tool called https://github.com/ddclient/ddclient[ddclient] will allow us to automatically update our DNS record when our IP change. Please refer to the link of https://github.com/ddclient/ddclient#supported-services[supported domain name providers] to pick one.
 
 === Overall architecture
 
@@ -90,7 +99,10 @@ Here, you can now select the IP range you want to use, and input your router's I
 
 image::DHCP.png[]
 
-Before turning your DHCP up, disable your router's DHCP to avoid any conflict.
+**Before turning your DHCP up, disable your router's DHCP to avoid any conflict.**
 Once pi-hole's DHCP is up and your router's down, reboot both of them, and refresh your computer's IP.
 You should be able to check that now your DNS' address is the pi-hole address.
 
+== Part 2: The main server
+
+Our server will host all of our *services*. Any machine will do. I Personally use an https://www.intel.fr/content/www/fr/fr/products/details/nuc.html[Intel NUC] machine, as it has a pretty ideal form factor when you need a decently powerful machine with no GPU.
