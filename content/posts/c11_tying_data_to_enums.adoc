@@ -76,6 +76,7 @@ In our case though, it has a big con. Namely, you’re breaking the first rule o
 
 **You don’t talk about implementation details in interfaces.**
 
+// suppress inspection "GrazieInspection"
 The data in data_array is strictly implementation detail. If data about the fruits were to be dynamically loaded (through a file, for example) at a later point, You still gave the opportunity to the user to use the details directly. And remember: the user will always do stupid shit with your interface._Remember that you too are someone else’s user._
 
 == The fix
@@ -135,7 +136,7 @@ struct my_data_array_s
 
 But now, you don’t have this guarantee that you won’t forget to update data_array at compile time if you add a new enum value, like with the X macro.Luckily, you are working in a relatively modern environment. And you have access to #C11. So you can actually enforce this.
 
-To make it short, you have to ensure at compile time that size of data_array is the same as the number of values in fruits_e. Let’s start by adding a "num value" value to our enum.
+To make it short, you have to ensure at compile time that size of data_array is the same as the number of values in fruits_e. Let’s start by adding a "num value" to our enum.
 
 .fruits.h
 [source,c]
@@ -272,7 +273,7 @@ _Static_assert(FRUITS_NUM_VALUE == SIZE_data_array, "Some data is missing in dat
 #undef X
 ----
 
-Sadly, because of how the preprocessor works, we can’t define FRUITS_NUM_VALUE in our interface.But it’s not a big deal, because we now have access to this enum through a X macro, which allow us to make this kind of stuff.
+Sadly, because of how the preprocessor works, we can’t define FRUITS_NUM_VALUE in our interface.But it’s not a big deal, because we now have access to this enum through an X macro, which allow us to make this kind of stuff.
 
 == In the end, we’re back to X macros.
 

@@ -32,7 +32,7 @@ print(f"this took {end_time - start_time} seconds")
 
 See, relatively heavy computation, and repeated inputs.
 
-The obvious way to do it is add a cache dictionary outside of the function scope. It works, but it's a global variable,
+The obvious way to do it is adding a cache dictionary outside the function scope. It works, but it's a global variable,
 and everyone with taste hate global variables.
 
 [source, python]
@@ -92,7 +92,7 @@ print(f"this took {end_time - start_time} seconds")
 
 Here, the cache parameter kinda behaves like a static variable in C in the end.
 
-But on the other hand, the caller can manage his cache by himself if he wants.. And the original function interface is still valid!
+But on the other hand, the caller can manage his cache by himself if he wants... And the original function interface is still valid!
 
 Test it yourself!
 

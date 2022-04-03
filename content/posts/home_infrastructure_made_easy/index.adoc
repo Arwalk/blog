@@ -5,7 +5,7 @@ draft: true
 ---
 
 Hey everyone.
-I've decided to start a small set of tutorials that should allow you to setup and maintain an IT infrastructure at home relatively easily.
+I've decided to start a small set of tutorials that should allow you to set up and maintain an IT infrastructure at home relatively easily.
 
 These tutorials suppose that you know how to:
 
@@ -14,9 +14,9 @@ These tutorials suppose that you know how to:
 - Know some basics of networking (such as what is a DNS, DHCP..)
 - Know some basic linux commands and ecosystem
 
-The rest will be as self-explanatory as possible, or i'll try to link to some other sources that will explain everything.
+The rest will be as self-explanatory as possible, or I'll try to link to some other sources that will explain everything.
 
-Networking nor IT infrastructure is not my line of work, and what i'm describing here is only what i think is a decent home set-up that is easy to maintain.
+Networking nor IT infrastructure is not my line of work, and what I'm describing here is only what I think is a decent home set-up that is easy to maintain.
 
 == Introduction
 
@@ -31,13 +31,13 @@ This whole series supposes that you have 2 machines for your infrastructure
 ==== The low power machine
 
 For the first machine, a raspberry pi-like machine is enough.
-You don't even need a "high end" pi, a simple raspberry pi 2 or 3 would be enough.
+You don't even need a "high-end" pi, a simple raspberry pi 2 or 3 would be enough.
 Anything else would probably be overkill.
 
 ==== The server
 
 For the second machine, I'd advise using something more beefy and more importantly, something with an x86_64 processor, not an ARM one.
-I personnally use an Intel NUC machine as they're pretty silent and the small form-factor is practical.
+I personally use an Intel NUC machine as they're pretty silent and the small form-factor is practical.
 
 ARM is excellent, and you can do with an ARM server machine, but it will bring a bit more work later.
 Mostly, this setup relies on using docker almost exclusively for hosting applications, and not all docker images are ARM compatible.
@@ -45,7 +45,7 @@ You can circumvent that by building your own docker images, but that can be a lo
 
 ==== The domain name
 
-If you can ensure your home public IP address is static, any domain name provider will do. If you can't though, don't worry: a tool called https://github.com/ddclient/ddclient[ddclient] will allow us to automatically update our DNS record when our IP change. Please refer to the link of https://github.com/ddclient/ddclient#supported-services[supported domain name providers] to pick one.
+If you can ensure your home public IP address is static, any domain name provider will do. If you can't though, don't worry: a tool called https://github.com/ddclient/ddclient[ddclient] will allow us to automatically update our DNS record when our IP changes. Please refer to the link of https://github.com/ddclient/ddclient#supported-services[supported domain name providers] to pick one.
 
 === Overall architecture
 
@@ -87,7 +87,7 @@ just run
 curl -sSL https://install.pi-hole.net | bash
 ----
 
-and the pi-hole installation should be done soon enough. The defaults are fine, you might want to choose your upstream DNS server if google's aren't your favorite choice.
+and the pi-hole installation should be done soon enough. The defaults are fine, you might want to choose your upstream DNS server if Google's aren't your favorite choice.
 
 Don't forget to note the password for the admin panel, it should be given at the end of the installation process.
 
