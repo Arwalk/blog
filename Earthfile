@@ -1,3 +1,4 @@
+VERSION 0.6
 ARG HUGO_VERSION="0.95.0"
 FROM klakegg/hugo:$HUGO_VERSION-asciidoctor
 
