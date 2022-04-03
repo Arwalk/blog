@@ -42,7 +42,8 @@ int main(void)
 }
 ----
 
-Now we just have to make the `zig_get_delay` function in a zig library. Let's setup a simple build.zig file.
+// suppress inspection "GrazieInspection"
+Now we just have to make the `zig_get_delay` function in a zig library. Let's set up a simple build.zig file.
 
 .build.zig
 [source, zig]
@@ -73,7 +74,7 @@ const mode = b.standardReleaseOptions();
 }
 ----
 
-Our crosstarget options will make something that PSoC Creator can use. Now let's make the zig source file itself.
+Our cross-target options will make something that PSoC Creator can use. Now let's make the zig source file itself.
 
 .lib.zig
 [source, zig]

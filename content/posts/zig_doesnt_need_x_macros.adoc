@@ -4,9 +4,9 @@ date: 2021-09-08T18:26:46+02:00
 draft: false
 ---
 
-If you remember the previous article xref:c11_tying_data_to_enums.adoc[C11 tying data to enums], you might know that i enjoy safety at compile time if i don't have to compromise with exposing implementation to the user.
+If you remember the previous article xref:c11_tying_data_to_enums.adoc[C11 tying data to enums], you might know that I enjoy safety at compile time if I don't have to compromise with exposing implementation to the user.
 
-I've been tinkering with Zig lately and it has been a real pleasure.The language feels like a better C in so many ways, without actually changing of paradigm.
+I've been tinkering with Zig lately, and it has been a real pleasure. The language feels like a better C in so many ways, without actually changing of paradigm.
 
 == The easy way
 
@@ -192,7 +192,7 @@ If we fail to comply, this is undefined behavior (at worst. On safe builds, it w
 What we want to enforce is that for each value in our enum, one line of the array is available and contains all our data.
 
 That last part is easy: except if you put voluntarily a default value, it's impossible to instantiate a struct in zig without putting a value explicitly in all fields.
-We're not gonna focus on that.
+We're not going to focus on that.
 
 What we are going to focus though, is the first part.
 
