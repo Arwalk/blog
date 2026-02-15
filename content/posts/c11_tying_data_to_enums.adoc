@@ -1,0 +1,281 @@
+---
+title: "C11 : Tying data to enums"
+date: 2021-09-08T16:38:52+02:00
+draft: false
+---
+
+Let’s say you’re making a C library that deals with fruits.Fruits have many "attributes" that could be tied to them.They could have a size, a color, and a weight, for starters.
+
+When you’re adding a new fruit, you want to be sure to add these attributes too.So, like many people, you start to use https://stackoverflow.com/questions/6635851/real-world-use-of-x-macros[X macros]. After all, it’s a typical use.
+
+Your lib could look like this:
+
+.fruits.h
+[source, c]
+----
+
+# pragma once
+
+#include <inttypes.h>
+
+typedef enum
+{
+    COLOR_GREEN,
+    COLOR_YELLOW,
+    COLOR_RED,
+} color_e;
+
+// enum, weight, size, color, name
+#define FRUIT_TABLE \
+    X(FRUITS_APPLE, 50, 10, COLOR_GREEN, "Apple") \
+    X(FRUITS_BANANA, 100, 20, COLOR_YELLOW, "Banana") \
+    X(FRUITS_STRAWBERRY, 10, 2, COLOR_RED, "Strawberry") \
+    X(FRUITS_PEACH, 45, 12, COLOR_RED, "Peach") \
+
+typedef enum
+{
+    #define X(enum, weight, size, color, name) enum,
+    FRUIT_TABLE
+    #undef X
+} fruits_e;
+
+uint32_t get_weight(fruits_e fruit);
+uint32_t get_size(fruits_e fruit);
+color_e  get_color(fruits_e fruit);
+const char*    get_name(fruits_e fruit);
+----
+
+.fruits.c
+[source,c]
+----
+#include "fruits.h"
+
+struct my_data_array_s
+{
+    fruits_e fruit;
+    uint32_t weight;
+    uint32_t size;
+    color_e color;
+    const char* name;
+} data_array[]=
+{
+    #define X(enum, weight, size, color, name) {enum, weight, size, color, name},
+    FRUIT_TABLE
+    #undef X
+};
+
+#define SIZE_data_array (sizeof(data_array)/sizeof(data_array[0]))
+----
+
+Using X macros ensures that if you add a new fruit in the list, you have to add its attributes too.This then populates automatically the data_array with the new value and attributes, and you can’t forget to update this array.
+
+That’s the big pro of X macros. It allows you to define a bunch of information in a single place, and reuse it easily.
+
+In our case though, it has a big con. Namely, you’re breaking the first rule of implementation details in interfaces:
+
+**You don’t talk about implementation details in interfaces.**
+
+// suppress inspection "GrazieInspection"
+The data in data_array is strictly implementation detail. If data about the fruits were to be dynamically loaded (through a file, for example) at a later point, You still gave the opportunity to the user to use the details directly. And remember: the user will always do stupid shit with your interface._Remember that you too are someone else’s user._
+
+== The fix
+
+Considering the user’s behavior, you have no choice but to leave the minimum of information on your interface. Namely, the enum itself.
+
+.fruits.h
+[source,c]
+----
+# pragma once
+
+#include <inttypes.h>
+
+typedef enum
+{
+    COLOR_GREEN,
+    COLOR_YELLOW,
+    COLOR_RED,
+} color_e;
+
+typedef enum
+{
+    FRUITS_APPLE,
+    FRUITS_BANANA,
+    FRUITS_STRAWBERRY,
+    FRUITS_PEACH,
+} fruits_e;
+
+uint32_t get_weight(fruits_e fruit);
+uint32_t get_size(fruits_e fruit);
+color_e  get_color(fruits_e fruit);
+const char*    get_name(fruits_e fruit);
+----
+
+.fruits.c
+[source,c]
+----
+#include "fruits.h"
+
+struct my_data_array_s
+{
+    fruits_e fruit;
+    uint32_t weight;
+    uint32_t size;
+    color_e color;
+    const char* name;
+} data_array[]=
+{
+    {FRUITS_APPLE, 50, 10, COLOR_GREEN, "Apple"},
+    {FRUITS_BANANA, 100, 20, COLOR_YELLOW, "Banana"},
+    {FRUITS_STRAWBERRY, 10, 2, COLOR_RED, "Strawberry"},
+    {FRUITS_PEACH, 45, 12, COLOR_RED, "Peach"},
+};
+
+#define SIZE_data_array (sizeof(data_array)/sizeof(data_array[0]))
+----
+
+But now, you don’t have this guarantee that you won’t forget to update data_array at compile time if you add a new enum value, like with the X macro.Luckily, you are working in a relatively modern environment. And you have access to #C11. So you can actually enforce this.
+
+To make it short, you have to ensure at compile time that size of data_array is the same as the number of values in fruits_e. Let’s start by adding a "num value" to our enum.
+
+.fruits.h
+[source,c]
+----
+typedef enum
+{
+    FRUITS_APPLE,
+    FRUITS_BANANA,
+    FRUITS_STRAWBERRY,
+    FRUITS_PEACH,
+
+    FRUITS_NUM_VALUE, // keep last
+} fruits_e;
+----
+
+And now, we just need to assert at compile time that `FRUITS_NUM_VALUE == SIZE_data_array`.
+
+C11 offers the `_Static_assert` keyword.Let’s try it.
+
+.fruits.c
+[source,c]
+----
+struct my_data_array_s
+{
+    fruits_e fruit;
+    uint32_t weight;
+    uint32_t size;
+    color_e color;
+    const char* name;
+} data_array[]=
+{
+    {FRUITS_APPLE, 50, 10, COLOR_GREEN, "Apple"},
+    {FRUITS_BANANA, 100, 20, COLOR_YELLOW, "Banana"},
+    {FRUITS_STRAWBERRY, 10, 2, COLOR_RED, "Strawberry"},
+    {FRUITS_PEACH, 45, 12, COLOR_RED, "Peach"},
+};
+
+#define SIZE_data_array (sizeof(data_array)/sizeof(data_array[0]))
+
+_Static_assert(FRUITS_NUM_VALUE == SIZE_data_array, "Some data is missing in data_array.");
+----
+
+Now, if I add a new value in my fruits_e enum…​
+
+.fruits.h
+[source, c]
+----
+typedef enum
+{
+    FRUITS_APPLE,
+    FRUITS_BANANA,
+    FRUITS_STRAWBERRY,
+    FRUITS_PEACH,
+    FRUITS_PEAR,
+
+    FRUITS_NUM_VALUE, // keep last
+} fruits_e;
+----
+
+It breaks at compile time.
+
+.error
+[source, bash]
+----
+../src/lib/fruits.c:20:1: error: static assertion failed: "Some data is missing in data_array."
+ _Static_assert(FRUITS_NUM_VALUE == SIZE_data_array, "Some data is missing in data_array.");
+----
+
+That's nice! We now have the same verification at compile time than the X macro.
+
+== But wait, my enum has skips!
+
+This tricks only works if your enum starts from 0 and has no specific values or skips.FRUITS_NUM_VALUES would not actually be the size of the enum in this case, even if last.
+
+So what could we do if your enum actually looked like this?
+
+.fruits.h
+[source,c]
+----
+typedef enum
+{
+    FRUITS_APPLE = 10,
+    FRUITS_BANANA= 20,
+    FRUITS_STRAWBERRY = 30,
+    FRUITS_PEACH = 40,
+} fruits_e;
+----
+
+It’s easy. We’re going to go back to X macros!
+
+They will allow us to define the enum the way we want, and to https://stackoverflow.com/a/25354018/11561171[count the number of elements in our enum] at the same time.
+
+.fruits.h
+[source,c]
+----
+#define FRUIT_TABLE \
+    X(FRUITS_APPLE, 10) \
+    X(FRUITS_BANANA, 20) \
+    X(FRUITS_STRAWBERRY, 30) \
+    X(FRUITS_PEACH, 40)
+
+typedef enum
+{
+#define X(enum, value) enum = value,
+    FRUIT_TABLE
+#undef X
+} fruits_e;
+----
+
+.fruits.c
+[source,c]
+----
+struct my_data_array_s
+{
+    fruits_e fruit;
+    uint32_t weight;
+    uint32_t size;
+    color_e color;
+    const char* name;
+} data_array[]=
+{
+    {FRUITS_APPLE, 50, 10, COLOR_GREEN, "Apple"},
+    {FRUITS_BANANA, 100, 20, COLOR_YELLOW, "Banana"},
+    {FRUITS_STRAWBERRY, 10, 2, COLOR_RED, "Strawberry"},
+    {FRUITS_PEACH, 45, 12, COLOR_RED, "Peach"},
+};
+
+#define SIZE_data_array (sizeof(data_array)/sizeof(data_array[0]))
+
+#define X(enum, value) + 1
+// This will expand to "+ 1" for each entry in FRUIT_TABLE.
+#define FRUITS_NUM_VALUE (0 FRUIT_TABLE)
+_Static_assert(FRUITS_NUM_VALUE == SIZE_data_array, "Some data is missing in data_array.");
+#undef X
+----
+
+Sadly, because of how the preprocessor works, we can’t define FRUITS_NUM_VALUE in our interface.But it’s not a big deal, because we now have access to this enum through an X macro, which allow us to make this kind of stuff.
+
+== In the end, we’re back to X macros.
+
+X macros are powerful tools, but you should be careful not to expose any detail of your implementation if you are using them in a header.With C11, you have the possibility to have the same level of compile-time check using `_Static_assert`, making them much more interesting to use directly.
+
+If you’re not using them in any interface though, you’re free to do it the way you want. Just be careful from the evil users.

@@ -2,3 +2,11 @@ baseURL = 'https://example.org/'
 languageCode = 'en-us'
 title = 'My New Hugo Site'
 theme = "ananke"
+
+[security.exec]
+allow = "asciidoctor"
+
+[markup.asciidocExt.attributes]
+source-highlighter = 'rouge'
+rouge-css = "style"
+#rouge-style = "thankful-eyes"

@@ -1,0 +1,276 @@
+---
+title: "Zig doesn't need X macros"
+date: 2021-09-08T18:26:46+02:00
+draft: false
+---
+
+If you remember the previous article xref:c11_tying_data_to_enums.adoc[C11 tying data to enums], you might know that I enjoy safety at compile time if I don't have to compromise with exposing implementation to the user.
+
+I've been tinkering with Zig lately, and it has been a real pleasure. The language feels like a better C in so many ways, without actually changing of paradigm.
+
+== The easy way
+
+Talking about this, if we reuse our fruits example in zig, it's so simple to avoid any compromise that it hurts.If we have such a `fruits.zig` library called by a `main.zig` program, here's how it might look.
+
+.fruits.zig
+[source,zig]
+----
+pub const Fruits = enum {
+
+	 Apple,
+	 Banana,
+	 Strawberry,
+	 Peach,
+
+	 pub const Color = enum {
+		 Green,
+		 Yellow,
+		 Red
+	 };
+
+	 pub fn get_weight(self: Fruits) u32 {
+		 return switch (self){
+			 .Apple => 50,
+			 .Banana => 100,
+			 .Strawberry => 10,
+			 .Peach => 45
+		 };
+	 }
+
+	 pub fn get_size(self: Fruits) u32 {
+		 return switch (self){
+			 .Apple => 10,
+			 .Banana => 20,
+			 .Strawberry => 10,
+			 .Peach => 12
+		 };
+	 }
+
+	 pub fn get_color(self: Fruits) Color {
+		 return switch (self){
+			 .Apple => .Green,
+			 .Banana => .Yellow,
+			 .Strawberry => .Red,
+			 .Peach => .Red
+		 };
+	 }
+
+	 pub fn get_name(self: Fruits)[]const u8 {
+	 	return switch (self){
+			 .Apple => "Apple",
+			 .Banana => "Banana",
+			 .Strawberry => "Strawberry",
+			 .Peach => "Peach"
+		 };
+	 }
+
+};
+----
+
+.main.zig
+[source,zig]
+----
+const std = @import("std");
+const fruits = @import("fruits.zig");
+const Fruits = fruits.Fruit
+
+pub fn main() anyerror!void {
+ 	const peach = Fruits.Peach;
+
+ 	std.debug.print("My fruit is a {s}, of color {} which weight {} and with a size of {}",
+	.{peach.get_name(), peach.get_color(), peach.get_weight(), peach.get_size()});
+
+};
+----
+
+This would print a nice `My fruit is a Peach, of color Color.Red which weight 45 and with a size of 12`.
+
+Right away, with this implementation, we don't have any need for more tools than the language itself: `switch-case` statements must be exhaustive in Zig.So if we add a new fruit, the compiler complains right away:
+
+[source,gcc]
+----
+.\src\fruits.zig:42:16: error: enumeration value 'fruits.Fruits.Pear' not handled in switch
+        return switch (self) {
+               ^
+.\src\fruits.zig:41:46: note: referenced here
+    pub fn get_name(self: Fruits) []const u8 {
+                                             ^
+.\src\fruits.zig:33:16: error: enumeration value 'fruits.Fruits.Pear' not handled in switch
+        return switch (self) {
+               ^
+.\src\fruits.zig:32:42: note: referenced here
+    pub fn get_color(self: Fruits) Color {
+                                         ^
+.\src\fruits.zig:15:16: error: enumeration value 'fruits.Fruits.Pear' not handled in switch
+        return switch (self) {
+               ^
+.\src\fruits.zig:14:41: note: referenced here
+    pub fn get_weight(self: Fruits) u32 {
+                                        ^
+.\src\fruits.zig:24:16: error: enumeration value 'fruits.Fruits.Pear' not handled in switch
+        return switch (self) {
+               ^
+.\src\fruits.zig:23:39: note: referenced here
+    pub fn get_size(self: Fruits) u32 {
+----
+
+That was easy.
+
+== The fun way
+
+Ok, the point of the previous article was that you could enforce custom rules at compile time in #C11 using `static_assert`.
+Zig has the possibility to evaluate code at compile time, which is an even more precise tool than `static_assert`.
+
+Let's make an array with an internal structure to hold all our data just like in C.
+
+[source,zig]
+----
+pub const Fruits = enum {
+    Apple,
+    Banana,
+    Strawberry,
+    Peach,
+
+    pub const Color = enum {
+        Green,
+        Yellow,
+        Red
+    };
+
+    const Data = struct {
+        enum_value: Fruits,
+        weight: u32,
+        size: u32,
+        color: Color,
+        name: []const u8
+    };
+
+    const internal_data = [_]Data {
+        .{.enum_value = .Apple, .weight = 50, .size = 10, .color =  .Green, .name = "Apple"},
+        .{.enum_value = .Banana, .weight = 100, .size = 20, .color =  .Yellow, .name = "Banana"},
+        .{.enum_value = .Strawberry, .weight = 10, .size = 2,  .color = .Red, .name = "Strawberry"},
+        .{.enum_value = .Peach, .weight = 45, .size = 12, .color =  .Red, .name = "Peach"},
+    };
+
+    pub fn get_weight(self: Fruits) u32 {
+        return for (internal_data) |data| {
+            if(data.enum_value == self) {
+                break data.weight;
+            }
+        } else unreachable;
+    }
+
+    pub fn get_size(self: Fruits) u32 {
+        return for (internal_data) |data| {
+            if(data.enum_value == self) {
+                break data.size;
+            }
+        } else unreachable;
+    }
+
+    pub fn get_color(self: Fruits) Color {
+        return for (internal_data) |data| {
+            if(data.enum_value == self) {
+                break data.color;
+            }
+        }  else unreachable;
+    }
+
+    pub fn get_name(self: Fruits) []const u8 {
+        return for (internal_data) |data| {
+            if(data.enum_value == self) {
+                break data.name;
+            }
+        } else unreachable;
+    }
+};
+----
+
+Notice the `else unreachable` that informs the compiler that we will ALWAYS have something to return out of our internal_data array.
+If we fail to comply, this is undefined behavior (at worst. On safe builds, it will just panic).
+
+What we want to enforce is that for each value in our enum, one line of the array is available and contains all our data.
+
+That last part is easy: except if you put voluntarily a default value, it's impossible to instantiate a struct in zig without putting a value explicitly in all fields.
+We're not going to focus on that.
+
+What we are going to focus though, is the first part.
+
+Let's open a `comptime` block and check this.
+
+[source,zig]
+----
+comptime {
+	if(internal_data.len != @typeInfo(Fruits).Enum.fields.len) {
+		@compileError("Some data is missing in internal_data");
+	}
+}
+----
+
+Wow.That was hard. Let's check, if I add a new fruit...
+
+[source,gcc]
+----
+.\src\fruits.zig:31:13: error: Some data is missing in internal_data
+            @compileError("Some data is missing in internal_data");
+----
+
+Ok.This is nice.
+But do you know what was impossible to check with `static_assert` that now we can do?
+Checking that there is _one and only one line for each different enum value_.
+
+Come on, this is easy, we can evaluate _anything_ at compile time in zig.
+
+[source,zig]
+----
+comptime {
+	if(internal_data.len != @typeInfo(Fruits).Enum.fields.len) {
+		@compileError("Some data is missing in internal_data");
+	}
+
+	inline for(@typeInfo(Fruits).Enum.fields) |enum_value| {
+		var already_found = false;
+		for(internal_data) |data| {
+			if(@enumToInt(data.enum_value) == enum_value.value) {
+				if(already_found) {
+					@compileError("Duplicate entries!");
+				}
+				else
+				{
+					already_found = true;
+				}
+			}
+		}
+	}
+}
+----
+
+This was less easy, as there is no direct way to iterate over an enum, but this is still clear enough.
+Now if I replace my `.enum_value = .Peach` by `.enum_value = .Apple` in the last line of my array, this gives me...
+
+[source,gcc]
+----
+.\src\fruits.zig:38:25: error: Duplicate entries!
+                        @compileError("Duplicate entries!");
+----
+
+This is nice.
+
+== Conclusion
+
+Zig rules.
+
+Also, our compilation messages could have been clearer, using `@compileLog` for example.But this is for another time.
+
+Also, remember, this doesn't expose any implementation detail to the user.If in `main.zig` I try to access `Fruits.internal_data` ...
+
+[source,gcc]
+----
+.\src\main.zig:7:28: error: 'internal_data' is private
+    const internal = Fruits.internal_data;
+                           ^
+.\src\fruits.zig:21:5: note: declared here
+    const internal_data = [_]Data {
+----
+
+I'll be frank, I am very hyped for Zig.
