@@ -1,0 +1,13 @@
+.{
+    .name = .blog,
+    .version = "0.0.1",
+    .dependencies = .{
+        .ananke = .{
+            .url = "https://github.com/theNewDynamic/gohugo-theme-ananke/archive/refs/tags/v2.12.1.zip",
+            .hash = "N-V-__8AAOkZIQCH0haNRQ2C4o9oQA2PvuX8N9CpAoqcb39W",
+        },
+    },
+    .minimum_zig_version = "0.15.2",
+    .paths = .{""},
+    .fingerprint = 0xc0155143158c3120,
+}
