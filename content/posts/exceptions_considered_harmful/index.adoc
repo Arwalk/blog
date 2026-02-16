@@ -1,0 +1,170 @@
+---
+title: "Exceptions_considered_harmful"
+date: 2022-08-10T11:35:41+01:00
+draft: false
+---
+
+If you were to receive this code in review, would you accept it?
+
+[source,c]
+----
+typedef struct  {
+    const char* message;
+} FirstError;
+
+typedef struct {
+    const char* message;
+} SecondError;
+
+static FirstError firstError = {0};
+static SecondError secondError = {0};
+
+void oneThingThatCanGoWrong();
+void anotherThingThatCanGoWrongBadly();
+
+
+int doSomething() {
+    int returnValue = 0;
+    {
+        oneThingThatCanGoWrong();
+        anotherThingThatCanGoWrongBadly();
+        goto Finally;
+    }
+FirstError:
+    {
+        // do something with the Error
+        goto Finally;
+    };
+SecondError:
+    {
+        // do something with this other Error
+        goto Finally;
+    };
+Finally:
+    return returnValue;
+}
+
+
+extern int mysteriousStuff();
+
+void oneThingThatCanGoWrong() {
+    //doing something mysterious that can go wrong here..
+    int result = mysteriousStuff();
+    if(result != 0)
+    {
+        firstError.message = "Something mysterious went wrong";
+        goto FirstError;
+    }
+}
+
+extern int strangeStuff();
+
+void anotherThingThatCanGoWrongBadly() {
+    // or something strange.
+    int result = strangeStuff();
+    if(result == 1) {
+        secondError.message = "Something strange went wrong";
+        goto SecondError;
+    } else if(result != 0) {
+        firstError.message = "Something strange went wrong too!";
+        goto FirstError;
+    }
+}
+----
+
+Let's focus on how errors are managed here. Yes, i know, goto's can't jump from a function to another since a long time in C, but it used to be ok. And we all know that goto's are terrible, right? After all, the title of this article is a reference to a https://homepages.cwi.nl/~storm/teaching/reader/Dijkstra68.pdf[much more famous article] about goto's.
+
+But in general, this code seems absolutely terrible, right? For example, when calling process we have no way to know if that's the first or the second call that failed, as they share the same error type. In general, this code seems hard to extend and work properly with.
+
+Let's see some completely unrelated java code.
+
+[source, java]
+----
+package demo;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
+
+public class Demo {
+    public static void main(String[] args) {
+        try {
+            File tempFile = File.createTempFile("tmp", "for us");
+            Files.write(tempFile.toPath(), "HelloWorld".getBytes(StandardCharsets.UTF_8))
+            System.out.println("so long!");
+        } catch (IOException e) {
+            return;
+        }
+        catch (IllegalArgumentException e){
+            return;
+        }
+    }
+}
+----
+
+This is perfectly valid java code, from the compiler point of view. But how do you know which method ( `createTempFile` or `Files.write` ) failed with IOException?
+
+Also, the `IllegalArgumentException` is both defined in the documentation of both methods, but it's an unchecked exception like all https://docs.oracle.com/javase/7/docs/api/java/lang/RuntimeException.html[derivatives from RuntimeException] . Once again, when this code runs, we have no proper way to know which one failed, but worse than that we have no hint from our tooling that we should check this error.
+
+In the end, the code paths are strikingly similar to our C example with gotos.
+
+Hence, exceptions aren't really better than gotos. The existence of unchecked exceptions might make them even worse!
+
+Now, imagine all this code where exceptions are deeply nested into multiple method calls. Can you really manage all your error cases properly when the error happened 3 to 4 methods under you and the code suddenly `jmped` to your first `try{..}catch{..}` block?
+
+What about the state of anything that had some side effects (such as writing files)? How do you recover when you don't even know where the error was in the first place when your code finally notices it?
+
+In the end, the only way to write this java code properly is to check for the exceptions at every call that can have an exception. Our java code should look like this.
+
+[source, java]
+----
+package demo;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+
+
+public class Demo {
+    public static void main(String[] args) {
+        File tempFile;
+        try {
+            tempFile = File.createTempFile("tmp", "for us");
+        } catch (IOException e) {
+            return;
+        }
+        catch (IllegalArgumentException e){
+            return;
+        }
+        
+        try {
+            Files.write(tempFile.toPath(), "HelloWorld".getBytes(StandardCharsets.UTF_8))
+        } catch (IOException e) {
+            return;
+        }
+        catch (IllegalArgumentException e){
+            return;
+        }
+        
+        System.out.println("so long! and thanks for all the fish!");
+    }
+}
+----
+
+But.. Wouldn't this code benefit from having actual error management, instead of using exceptions? Exceptions are costly.
+
+I had the conclusion recently that exceptions aren't better than surprise goto's after having to debug some code that was relying a lot on them. I tend to be quite suspicious about my own conclusions, especially in languages i can't pretend to master, so i looked a bit around.
+
+I'm not the only one thinking this. Joel from joelonsoftware https://www.joelonsoftware.com/2003/10/13/13/[came to the same conclusions].
+
+To his own comments i'd add that a method's parameters and return value are a contract. This contract is broken with unchecked exceptions, and can hardly be considered valid with checked exceptions.
+
+The complexity of code that uses exceptions is insane when you take the time to think about it. This must be why most modern languages dropped them (more or less) :
+
+* Go has no exception, but a simple pattern of return (result, error), with expectation of the caller checking for error != null.
+* Rust has something that ends up being relatively similar with Result<T, E>
+* Zig has error unions with special syntax.
+* Kotlin still has exceptions, but has Result<T> that allows to return a result or an exception object (instead of throwing it). Also, it's trivial to remove exceptions entirely using sealed classes in return values.
+
+Managing error early and properly takes some time when writing the code, but maintaining said code is absolutely trivial in comparison to exception-based error management.
