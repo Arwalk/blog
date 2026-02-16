@@ -1,0 +1,99 @@
+---
+title: "Easily add cache to a python function"
+date: 2021-09-16T22:21:07+02:00
+draft: false
+---
+
+Here's a quick trick. It's extremely easy to cache a function's output in python.
+
+Let's say you have this heavy computation task in your python code. Or something that repeatedly gets similar inputs at least.
+
+Speeding it up would be costly, so you wonder how you could add a caching mechanism in it without having to rewrite your entire code base around it.
+
+Here is our example for now:
+
+[source, python]
+----
+import hashlib
+import time
+
+lorem = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc in turpis id purus accumsan porta volutpat quis diam. Etiam bibendum condimentum consequat. Vivamus a nibh rhoncus, consequat nulla in, interdum nisi. Mauris eu molestie arcu, sed fermentum est. Suspendisse imperdiet, felis in congue ultrices, tellus massa ultricies quam, ac finibus mi ante in mi. Aliquam blandit varius leo, non accumsan augue dictum id. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vitae ornare nisl. Praesent nisl velit, tincidunt laoreet purus sodales, facilisis lacinia est. Vivamus efficitur nulla sed odio fringilla scelerisque. Ut in malesuada leo. Quisque faucibus purus aliquam, vehicula sapien ut, finibus nisi. Nulla quis elementum ipsum. Sed convallis purus magna, sit amet rhoncus dui cursus et."
+
+def do_task(input):
+    return hashlib.sha224(input).hexdigest()
+
+start_time = time.time()
+for _ in range(9001):
+    do_task(lorem)
+
+end_time = time.time()
+print(f"this took {end_time - start_time} seconds")
+----
+
+See, relatively heavy computation, and repeated inputs.
+
+The obvious way to do it is adding a cache dictionary outside the function scope. It works, but it's a global variable,
+and everyone with taste hate global variables.
+
+[source, python]
+----
+import hashlib
+import time
+
+lorem = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc in turpis id purus accumsan porta volutpat quis diam. Etiam bibendum condimentum consequat. Vivamus a nibh rhoncus, consequat nulla in, interdum nisi. Mauris eu molestie arcu, sed fermentum est. Suspendisse imperdiet, felis in congue ultrices, tellus massa ultricies quam, ac finibus mi ante in mi. Aliquam blandit varius leo, non accumsan augue dictum id. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vitae ornare nisl. Praesent nisl velit, tincidunt laoreet purus sodales, facilisis lacinia est. Vivamus efficitur nulla sed odio fringilla scelerisque. Ut in malesuada leo. Quisque faucibus purus aliquam, vehicula sapien ut, finibus nisi. Nulla quis elementum ipsum. Sed convallis purus magna, sit amet rhoncus dui cursus et."
+
+cache = {}
+
+def do_task(input):
+    if input not in cache:
+        cache[input] = hashlib.sha224(input).hexdigest()
+    return cache[input]
+
+start_time = time.time()
+for _ in range(9001):
+    do_task(lorem)
+
+end_time = time.time()
+print(f"this took {end_time - start_time} seconds")
+----
+
+How could we make this better? We don't want a global variable, so we could add a parameter to our function so the cache
+is managed by the caller. But that poses two problems potentially: it will require us to rewrite anything that uses `do_task`
+to manage this parameter, and it will force the caller to manage the cache. It's a lot of work potentially. Not in our example
+of course, but in a real situation this would require a big rewrite.
+
+Or does it?
+
+Here's a little known fact about python: if a parameter with a default value is initialized with an object **it is always the same reference to this object that is used if the default parameter is required**. This allows us to add a cache parameter, defaulting to a new dict.
+But that same dict will always be reused everytime the default parameter is silently required.
+
+We can rewrite our example like this then:
+
+[source, python]
+----
+import hashlib
+import time
+
+lorem = b"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc in turpis id purus accumsan porta volutpat quis diam. Etiam bibendum condimentum consequat. Vivamus a nibh rhoncus, consequat nulla in, interdum nisi. Mauris eu molestie arcu, sed fermentum est. Suspendisse imperdiet, felis in congue ultrices, tellus massa ultricies quam, ac finibus mi ante in mi. Aliquam blandit varius leo, non accumsan augue dictum id. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam vitae ornare nisl. Praesent nisl velit, tincidunt laoreet purus sodales, facilisis lacinia est. Vivamus efficitur nulla sed odio fringilla scelerisque. Ut in malesuada leo. Quisque faucibus purus aliquam, vehicula sapien ut, finibus nisi. Nulla quis elementum ipsum. Sed convallis purus magna, sit amet rhoncus dui cursus et."
+
+
+def do_task(input, cache={}):
+    if input not in cache:
+        cache[input] = hashlib.sha224(input).hexdigest()
+    return cache[input]
+
+start_time = time.time()
+for _ in range(9001):
+    do_task(lorem)
+
+end_time = time.time()
+print(f"this took {end_time - start_time} seconds")
+----
+
+Here, the cache parameter kinda behaves like a static variable in C in the end.
+
+But on the other hand, the caller can manage his cache by himself if he wants... And the original function interface is still valid!
+
+Test it yourself!
+
+Hope this trick will be useful for you. Cya.
