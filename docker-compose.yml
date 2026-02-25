@@ -1,0 +1,7 @@
+services:
+  blog:
+    build: .
+    container_name: blog
+    ports:
+      - "6572:80"
+    restart: always
