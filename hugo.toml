@@ -1,7 +1,8 @@
-baseURL = 'https://example.org/'
-languageCode = 'en-us'
-title = 'My New Hugo Site'
-theme = "ananke"
+baseURL = 'https://blog.arwalk.net'
+DefaultContentLanguage = "en" # Theme's display language, supports: en, fr, zh, zh-hant
+languageCode = "en-us"
+title = "Arwalk's blog"
+theme = "hugo-coder"
 
 [security.exec]
 allow = "asciidoctor"
@@ -9,4 +10,43 @@ allow = "asciidoctor"
 [markup.asciidocExt.attributes]
 source-highlighter = 'rouge'
 rouge-css = "style"
-#rouge-style = "thankful-eyes"
+rouge-style = "monokai.sublime"
+
+[params]
+  author = "Arwalk"
+  info = "My stuff i guess"
+  description = "Arwalk's blog"
+  keywords = "blog,developer,personal"
+  gravatar = "siragentprovocateurarwalk@gmail.com"
+
+  
+  
+  enableTwemoji = true
+
+  colorScheme = "auto"
+  hidecolorschemetoggle = false
+
+  # customCSS = ["css/custom.css"]
+  # customSCSS = ["scss/custom.scss"]
+  # customJS = ["js/custom.js"]
+
+[taxonomies]
+  category = "categories"
+  series = "series"
+  tag = "tags"
+  author = "authors"
+
+# Menu links
+[[menu.main]]
+  name = "Blog"
+  weight = 1
+  url  = "posts/"
+[[menu.main]]
+  name = "About"
+  weight = 2
+  url = "about/"
+
+[sitemap]
+  changefreq = "always"
+  filename = "sitemap.xml"
+  priority = 0.5

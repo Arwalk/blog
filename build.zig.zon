@@ -6,6 +6,18 @@
             .url = "https://github.com/theNewDynamic/gohugo-theme-ananke/archive/refs/tags/v2.12.1.zip",
             .hash = "N-V-__8AAOkZIQCH0haNRQ2C4o9oQA2PvuX8N9CpAoqcb39W",
         },
+        .tokiwa = .{
+            .url = "https://codeload.github.com/heyeshuang/hugo-theme-tokiwa/zip/aeb90d22c0ff458b589b3d0eacc31e0ffe661336",
+            .hash = "N-V-__8AAD0NfAFz026Lz7k_jnQuBlTo6nlvQM_HltPYr0TO",
+        },
+        .diary = .{
+            .url = "https://codeload.github.com/AmazingRise/hugo-theme-diary/zip/0d8afbaf3d6be6ae3b37c8f87cecf2946af5f8c1",
+            .hash = "N-V-__8AAAssXgDwGBofnLIvkKMbkOcu3rRylTHu9i5eaj3q",
+        },
+        .@"hugo-coder" = .{
+            .url = "https://github.com/luizdepra/hugo-coder/archive/refs/tags/v1.2.zip",
+            .hash = "N-V-__8AAJmcJQABA8U4lrG2ZNEO3mlIo5KMQCgDaGWYqFqP",
+        },
     },
     .minimum_zig_version = "0.15.2",
     .paths = .{""},

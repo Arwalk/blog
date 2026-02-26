@@ -6,7 +6,7 @@ fn installTheme(b: *std.Build, name: []const u8) void {
 }
 
 pub fn build(b: *std.Build) void {
-    installTheme(b, "ananke");
+    installTheme(b, "hugo-coder");
 
     const hugo_server = b.addSystemCommand(&.{ "hugo", "server" });
 
