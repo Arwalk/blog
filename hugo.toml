@@ -7,6 +7,9 @@ theme = "hugo-coder"
 [security.exec]
 allow = "asciidoctor"
 
+[markup.highlight]
+style = "github-dark"
+
 [markup.asciidocExt.attributes]
 source-highlighter = 'rouge'
 rouge-css = "style"
@@ -41,12 +44,23 @@ rouge-style = "monokai.sublime"
   name = "Blog"
   weight = 1
   url  = "posts/"
-[[menu.main]]
-  name = "About"
-  weight = 2
-  url = "about/"
 
 [sitemap]
   changefreq = "always"
   filename = "sitemap.xml"
   priority = 0.5
+
+[[params.social]]
+  name = "Github"
+  icon = "fa-brands fa-github fa-2x"
+  weight = 1
+  url = "https://github.com/Arwalk/"
+
+[[params.social]]
+  name = "RSS"
+  icon = "fas fa-rss fa-2x"
+  url = "/index.xml"
+
+[outputs]
+  home = ['html', 'rss', 'webappmanifest']
+  section = ['html', 'rss', 'webappmanifest']
