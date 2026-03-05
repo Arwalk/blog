@@ -1,0 +1,19 @@
+---
+title: "Do not accept the term sideloading"
+date: 2026-03-05T18:18:44+01:00
+draft: false
+---
+
+Google has been pushing anti-consumer BS on their Android platform. Their goal is obviously to force people to go through the Google-mandated-and-overseen Play Store for all their software. The act of starting android applications outside of the regulated Play Store has been then called "sideloading".
+
+The fight starts here. For less tech-oriented users, the term "sideloaded" shifts the balance in favor of google. It presents the act of installing and launching software out of the store something you do "on the side", not in a regular way.
+
+Refuse to use this term. The whole point of an operating software is to run other software. Point how absurd it is to call it that way.
+
+Did you install Steam through the microsoft store ? What do you mean you're sideloading Steam?
+
+Are you sideloading League of Legends?
+
+Are you sideloading Photoshop ?
+
+Of course not, you're just running software. Call it that way. Call out anyone using the term, politely if it's out of ignorance, and bluntly if it's a google rep. Intercept their word, point out how absurd it is to say it that way.
