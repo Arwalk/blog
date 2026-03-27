@@ -1,0 +1,6 @@
+---
+title: "Custom JSON encoding options for zig"
+date: 2026-03-27T20:21:58+01:00
+draft: true
+---
+
