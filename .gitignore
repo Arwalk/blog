@@ -4,3 +4,4 @@ zig-out
 themes/*
 public/*
 resources/*
+.DS_Store
