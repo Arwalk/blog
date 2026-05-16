@@ -1,6 +1,5 @@
 ---
 title: "2025 media recap"
-date: 2026-03-09T16:57:50+01:00
 draft: true
 ---
 
@@ -21,6 +20,16 @@ It's a collection of short novels, each one focused on a specific primarch. Not 
 Some of my favorite characters of the horus heresy appear on this one, notably Lucius (a chaos space marine that wants to be the greatest swordmaster) and the Alpha Legion twin primarchs (in which they plan an operation against their own, classic Alpha Legion move).
 
 Overall a decent read.
+
+==== Fear to Tread
+
+image::fear_to_tread.jpg[]
+
+This one is centered around the Blood Angels, the "we're vampires lol" legion. Just like the Space Wolves, i used to not be very interested in them and found them pretty bland, but once you read a bit more about them, they're more interesting than I expected.
+
+The novel narrates the events of how Sanguinius and his legion were sent into a trap by Horus, before knowing of his treachery. There is a lot of foreshadowing on the future events of WH40k toward this specific legion.
+
+It's the same author than Nemesis. I didn't like Nemesis very much, and this book started a bit boring, but the last chapters were a nice read.
 
 == Webtoons/Manga
 
