@@ -64,3 +64,9 @@ rouge-style = "monokai.sublime"
 [outputs]
   home = ['html', 'rss', 'webappmanifest']
   section = ['html', 'rss', 'webappmanifest']
+
+[params.utterances]
+  repo = "Arwalk/blog" # https://utteranc.es/#heading-repository
+  issueTerm = "title" # https://utteranc.es/#heading-mapping
+  label = "" # https://utteranc.es/#heading-issue-label
+  theme = "preferred-color-scheme" # https://utteranc.es/#heading-theme
