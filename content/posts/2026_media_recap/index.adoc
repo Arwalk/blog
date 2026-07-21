@@ -9,6 +9,16 @@ This time I tried to do it all year so I don't forget too much stuff.
 
 == Books
 
+=== Various
+
+==== The Snare of the Tree, and Other Perilous Seductions
+
+image::snareofthetree.png[]
+
+This is a book from one of the creators of the game Cultist Simulator, also worked on Fallen London. It's a very short book, less than a hundred pages, giving advices on game design. It interestingly focuses on traps that are easy to fall into but rarely discussed (for example, how a temporary name for a game might influence its design). If you're interested in game design, it's worth reading, and very short.
+
+And if you liked it, you should probably read the main book from the same author: "Against Worldbuilding, and other provocations"
+
 === The Horus Heresy series
 
 ==== The Primarchs
