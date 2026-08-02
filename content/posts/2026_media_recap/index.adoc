@@ -1,11 +1,19 @@
 ---
-title: "2025 media recap"
+title: "2026 media recap"
 draft: true
 ---
 
 This time I tried to do it all year so I don't forget too much stuff.
 
 == Video Games
+
+=== Witchspring R
+
+image::witchpsringr.jpg[]
+
+A very classical JRPG following a young witch in a world where they are persecuted. Combat is turn by turn, exploration is based on gathering resources and crafting. Overall a pleasant experience: the writing is funny enough, combat has some interesting parts (and you can even make a fighter witch instead of a magical witch).
+
+It kind of overstayed its welcome for me though, i got a bit tired of it at the end. Steam comments seem to agree that the DLC is not very interesting, but I haven't played it. Still a fun game.
 
 == Books
 
